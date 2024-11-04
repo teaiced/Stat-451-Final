@@ -1,6 +1,12 @@
 # Stat-451-Final
-We will be exploring CO2 emission estimates, total population, GDP, and endangered species all categorized by country. The datasets from which we are taking this from are all compiled by UNdata. Our primary focus is how CO2 emissions have developed over the past 50 years both in specific countries and on a global scale. To achieve this, we plan to use line plots to graph emissions over time and identify any technological advancements, policies, or other such events that may have induced large changes. 
+We will analyze CO2 emissions, population, GDP, and endangered species data from UNdata. 
+We plan to integrate the datasets using the shared country column. 
 
-Additionally, we are interested in analyzing the relationships between CO2 emissions and other country-specific factors like population and GDP. What is the correlation between these two variables and CO2 emissions? Furthermore, has the correlation increased or decreased over time? We will also take advantage of country data in R to create geographic visualizations as to understand spatial trends. If possible, we would also like to be able to display and interact with these correlations in a layered data visualization such that we can see multiple or specified patterns at the same time in the same space.
+Our primary focus is tracking CO2 emissions over the past 50 years, both globally and in specific countries. We will use line plots to illustrate emissions trends over time and highlight key technological advancements, policy changes, or other significant events that may have driven major changes in emission levels.
 
-Finally, we also want to examine the human impact on the environment through another lens which is endangered species. Again, using R's country data, we can identify the regions with the highest total number of threatened species and the breakdown of vertebrates, invertebrates and plants. Comparing this information to the CO2 emission estimates data, we can gain a greater understanding of the relationship between CO2 emissions and various endangered species.
+In addition, we aim to analyze the relationships between CO2 emissions and other country-specific factors, such as population and GDP. Specifically, we will examine the correlation between these variables and CO₂ emissions, assessing whether these correlations have increased or decreased over time
+
+We will also use country data in R to create geographic visualizations to understand spatial trends. Moreover, we would like to display and interact with these correlations in a layered data visualization in which we can see multiple or specified patterns in the same space.
+
+Finally, we want to examine human environmental impact with endangered species data. Again, using R's country data, we can identify the regions with the highest total number of threatened species and the breakdown of vertebrates, invertebrates, and plants. Comparing this information to the CO2 emission estimates data, we can better understand the relationship between CO2 emissions and various endangered species.
+
