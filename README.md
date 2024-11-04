@@ -8,5 +8,5 @@ In addition, we aim to analyze the relationships between CO₂ emissions and oth
 
 We will also use country data in R to create geographic visualizations to understand spatial trends. Moreover, we would like to display and interact with these correlations in a layered data visualization in which we can see multiple or specified patterns in the same space.
 
-Finally, we want to examine human environmental impact with endangered species data. Again, using R's country data, we can identify the regions with the highest total number of threatened species and the breakdown of vertebrates, invertebrates, and plants. Comparing this information to the CO₂ emission estimates data, we can better understand the relationship between CO2 emissions and various endangered species.
+Finally, we want to examine human environmental impact with endangered species data. Again, using R's country data, we can identify the regions with the highest total number of threatened species and the breakdown of vertebrates, invertebrates, and plants. Comparing this information to the CO₂ emission estimates data, we can better understand the relationship between CO₂ emissions and various endangered species.
 
