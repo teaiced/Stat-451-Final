@@ -2,8 +2,11 @@
 We will analyze CO₂ emissions, population, and GDP data.
 We plan to integrate the datasets using the shared country column. 
 Our data is from the following sources.
+
 https://zenodo.org/records/10065794
+
 https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?end=2023&start=1960&view=chart
+
 https://data.worldbank.org/indicator/SP.POP.TOTL
 
 Our primary focus is tracking CO₂ emissions over time, both globally and in specific countries. We will use line plots to illustrate emissions trends over time and highlight key technological advancements, policy changes, or other significant events that may have driven major changes in emission levels.
