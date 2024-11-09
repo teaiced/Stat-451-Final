@@ -1,9 +1,12 @@
 # Stat-451-Final
-We will analyze CO₂ emissions, population, GDP, and endangered species data from UNdata.
+We will analyze CO₂ emissions, population, and GDP data.
 We plan to integrate the datasets using the shared country column. 
-https://data.un.org/
+Our data is from the following sources.
+https://zenodo.org/records/10065794
+https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?end=2023&start=1960&view=chart
+https://data.worldbank.org/indicator/SP.POP.TOTL
 
-Our primary focus is tracking CO₂ emissions over the past 50 years, both globally and in specific countries. We will use line plots to illustrate emissions trends over time and highlight key technological advancements, policy changes, or other significant events that may have driven major changes in emission levels.
+Our primary focus is tracking CO₂ emissions over time, both globally and in specific countries. We will use line plots to illustrate emissions trends over time and highlight key technological advancements, policy changes, or other significant events that may have driven major changes in emission levels.
 
 In addition, we aim to analyze the relationships between CO₂ emissions and other country-specific factors, such as population and GDP. Specifically, we will examine the correlation between these variables and CO₂ emissions, assessing whether these correlations have increased or decreased over time.
 
