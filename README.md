@@ -2,8 +2,10 @@
 ## Plan
 We will analyze CO₂ emissions, population, and GDP data. We plan to integrate the datasets using the shared country column. Our data is from the following sources.
 
-https://zenodo.org/records/10065794
+https://zenodo.org/records/10065794 
+
 https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?end=2023&start=1960&view=chart
+
 https://data.worldbank.org/indicator/SP.POP.TOTL
 
 Our primary focus is tracking CO₂ emissions over time, both globally and in specific countries. We will use line plots to illustrate emissions trends over time. Our goal is to utilize R shiny to make these plots interactive, so the user can select specific countries and specific ranges of years. Moreover, we want the user to be able to click a point on the graph and have more details displayed. 
