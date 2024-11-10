@@ -1,4 +1,6 @@
 # Stat-451-Final
+Members: Ben Tanenbaum, Josephine Czeskleba, Oliver Brown, Thy Luong
+
 ## Plan
 We will analyze CO₂ emissions, population, and GDP data. We plan to integrate the datasets using the shared country column. Our data is from the following sources.
 
