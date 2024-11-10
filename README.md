@@ -1,5 +1,5 @@
 # Stat-451-Final
-## Project Plan
+## Plan
 We will analyze CO₂ emissions, population, and GDP data. We plan to integrate the datasets using the shared country column. Our data is from the following sources.
 
 https://zenodo.org/records/10065794
