@@ -17,9 +17,12 @@ In addition, we aim to analyze the relationships between CO₂ emissions and oth
 Finally, we will use country data in R to create geographic visualizations to understand the spatial trends of CO₂ emissions. We plan to make several interactive world maps that display things like CO₂ emissions, per capita CO₂ emissions, and annual percent change in CO₂ emissions. Again, we want the user to be able to click on a particular country on the map and have more details displayed. 
 
 ## Preliminary Visualizations 
-### Plot 1 
-The plot displays annual CO2 emissions in metric tonnes from the last 100 years. It focuses on the top three countries with the current highest carbon emissions and the global total. The y-axis ticks are labeled with their units to increase comprehension. In our final project, we plan to create a similar visualization- however, the year range and the countries displayed will be selectable to the viewer. 
 
+### Plot 1 
+The plot displays annual CO₂ emissions in metric tonnes from the last 100 years. It focuses on the top three countries with the current highest carbon emissions and the global total. The y-axis ticks are labeled with their units to increase comprehension. In our final project, we plan to create a similar visualization- however, the year range and the countries displayed will be selectable to the viewer. 
+
+## Plot 2
+The plot displays annual population in billions of people from the last 80 years. It focuses on the top three countries with the current highest carbon emissions and the global total. The y-axis ticks are labeled in billions due to the high population of people in the world. The final version with be accompanied with selectable options to decide country and year range specified. The main purpose of this visualization to accompany analysis of CO₂ emissions since this will be one of the factors examined alongside CO₂ emissions.
 
 
 
