@@ -24,6 +24,10 @@ The plot displays annual CO₂ emissions in metric tonnes from the last 100 year
 ## Plot 2
 The plot displays annual population in billions of people from the last 80 years. It focuses on the top three countries with the current highest carbon emissions and the global total. The y-axis ticks are labeled in billions due to the high population of people in the world. The final version with be accompanied with selectable options to decide country and year range specified. The main purpose of this visualization to accompany analysis of CO₂ emissions since this will be one of the factors examined alongside CO₂ emissions.
 
+## Plot 3
+
+The plot presents global GDP, population, and CO₂ emissions for 2020 in a color-coded format, allowing for direct comparison across three separate maps. Each metric is represented on a gradient scale from blue to red, with red indicating higher values. The GDP map, scaled in billions of dollars, highlights major economies like the United States and China, while the population map, scaled to millions, emphasizes demographic giants such as China and India. The CO₂ emissions map, in thousands of metric tons, showcases high-emission regions, primarily industrialized nations. Together, these maps effectively illustrate the global landscape of economic power, population distribution, and environmental impact.
+
 
 
 
