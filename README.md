@@ -28,6 +28,6 @@ The plot displays annual population in billions of people from the last 80 years
 
 The plot presents global GDP, population, and CO₂ emissions for 2020 in a color-coded format, allowing for direct comparison across three separate maps. Each metric is represented on a gradient scale from blue to red, with red indicating higher values. The GDP map, scaled in billions of dollars, highlights major economies like the United States and China, while the population map, scaled to millions, emphasizes demographic giants such as China and India. The CO₂ emissions map, in thousands of metric tons, showcases high-emission regions, primarily industrialized nations. Together, these maps effectively illustrate the global landscape of economic power, population distribution, and environmental impact.
 
-
-
+## Plot 4
+The plot shows GDP since 1960 for the world and the three countries with the current highest carbon emissions. We plan to make the countries and year range selectable for the user in our Shiny application. You can conclude that global GDP is increasing exponentially while the US's and India's GDPs are increasing linearly. China's GDP has been increasing exponentially since 1980 and appears on track to surpass the US soon. The y-axis is measured in 2015 USD to provide a constant point of comparison while the x-axis displays the year to track the variables over time. 
 
