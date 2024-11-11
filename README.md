@@ -18,7 +18,7 @@ Finally, we will use country data in R to create geographic visualizations to un
 
 ## Preliminary Visualizations 
 
-### Plot 1 
+## Plot 1 
 The plot displays annual CO₂ emissions in metric tonnes from the last 100 years. It focuses on the top three countries with the current highest carbon emissions and the global total. The y-axis ticks are labeled with their units to increase comprehension. In our final project, we plan to create a similar visualization- however, the year range and the countries displayed will be selectable to the viewer. 
 
 ## Plot 2
