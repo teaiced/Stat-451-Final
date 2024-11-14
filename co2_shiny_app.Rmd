@@ -1,0 +1,82 @@
+---
+title: "stat451_final_proj_pt3"
+author: "Josie Czeskleba"
+date: "2024-11-14"
+output: pdf_document
+---
+
+# Setup
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(bslib)
+library(tidyverse)
+library(dplyr)
+library(skimr)
+library(scales)
+```
+
+# Read + Clean Data
+
+```{r read data}
+co2 <- read.csv('co2.csv')
+
+```
+
+# UI
+```{r}
+
+ui <- fluidPage(
+  titlePanel("CO2 Emissions Over Time"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput(
+        inputId = "years", 
+        label = "Select year range:", 
+        min = 1961, 
+        max = 2023, 
+        value = c(1961, 2023)
+      )
+    ),
+    mainPanel(
+      plotOutput(outputId = "co2_line_plot")
+    )
+  )
+)
+```
+
+# Server
+```{r}
+server <- function(input, output) {
+
+  co2_filtered <- reactive({
+    co2 %>%
+      filter(Year >= input$years[1] & Year <= input$years[2]) %>%
+      filter(Country %in% c("USA", "India", "China", "Global"))
+  })
+
+  output$co2_line_plot <- renderPlot({
+    ggplot(co2_filtered(), aes(x = Year, y = Total, color = Country)) +
+      geom_line() +
+      labs(
+        title = "How Have CO2 Emissions Changed Over Time?",
+        subtitle = "Carbon Dioxide emissions in metric tonnes",
+        y = "Emissions (billion tonnes)",
+        color = "Country"
+      ) +
+      
+      scale_y_continuous(
+        labels = label_number(scale = 1e-3, suffix = " billion t"),
+        breaks = seq(0, max(co2_filtered()$Total, na.rm = TRUE), by = 5e3)
+      ) +
+      theme_minimal()
+  })
+}
+
+```
+
+# Shiny App
+```{r}
+shinyApp(ui = ui, server = server)
+```
+
