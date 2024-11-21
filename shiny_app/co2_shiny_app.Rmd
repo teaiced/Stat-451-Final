@@ -35,7 +35,14 @@ ui <- fluidPage(
         label = "Select year range:", 
         min = 1961, 
         max = 2023, 
-        value = c(1961, 2023)
+        value = c(1961, 2023),
+        sep = ""
+      ),
+      selectInput(
+        inputId = "country", 
+        label = "Select a country:", 
+        choices = unique(co2$Country),
+        multiple = TRUE
       )
     ),
     mainPanel(
@@ -43,6 +50,7 @@ ui <- fluidPage(
     )
   )
 )
+
 ```
 
 # Server
@@ -52,9 +60,12 @@ server <- function(input, output) {
   co2_filtered <- reactive({
     co2 %>%
       filter(Year >= input$years[1] & Year <= input$years[2]) %>%
-      filter(Country %in% c("USA", "India", "China", "Global"))
+      filter(Country %in% c(input$country))%>%
+      arrange(desc(Year == input$years[2]), desc(Total)) %>%
+      mutate(Country = factor(Country, levels = unique(Country))) %>%
+      mutate(Country = recode(Country, "USA" = "United States"))
   })
-
+    
   output$co2_line_plot <- renderPlot({
     ggplot(co2_filtered(), aes(x = Year, y = Total, color = Country)) +
       geom_line() +
@@ -72,6 +83,7 @@ server <- function(input, output) {
       theme_minimal()
   })
 }
+
 
 ```
 
