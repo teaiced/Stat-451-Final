@@ -52,6 +52,17 @@ common_years <- Reduce(intersect, list(unique(gdp_data$Year), unique(pop_data$Ye
 start_year <- min(common_years)
 end_year <- max(common_years)
 
+generate_shared_palette <- function(countries) {
+  all_colors <- brewer_pal(palette = "Set1")(length(countries))
+  visible_colors <- setdiff(all_colors, c("#FFFF33"))
+  final_palette <- visible_colors[seq_along(countries)]
+  names(final_palette) <- countries
+  final_palette
+}
+
+shared_palette <- scales::brewer_pal(palette = "Set4")(length(common_countries))
+shared_palette <- generate_shared_palette(common_countries)
+
 process_and_plot_bar <- function(data_list, variables, year_range, global_limits, change_type, countries) {
   plots <- list()
   
@@ -186,7 +197,7 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
     
     p <- ggplot(data_filtered, aes(x = Year, y = !!sym(value_col), color = Country)) +
       geom_line(size = 1.2, na.rm = TRUE) +
-      scale_color_brewer(palette = "Set1") +
+      scale_color_manual(values = shared_palette) +
       theme_minimal() +
       labs(
         title = paste(variable_name, "Over Time"),
@@ -220,4 +231,3 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
   
   wrap_plots(plots, nrows(length(plots)))
 }
-
