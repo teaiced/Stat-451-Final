@@ -14,6 +14,7 @@ ui <- fluidPage(
                          selected = c("gdp", "population", "co2")),
       selectInput("countries", "Select countries:", 
                   choices = unique(common_countries),
+                  selected = "Global",
                   multiple = TRUE),
       radioButtons("change_type", "Select Change Type:",
                    choices = c("Percentage Change" = "percentage"),
