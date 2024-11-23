@@ -13,20 +13,25 @@ ui <- fluidPage(
                          choices = c("GDP" = "gdp", "Population" = "population", "CO2 Emissions" = "co2"),
                          selected = c("gdp", "population", "co2")),
       selectizeInput("countries", "Select up to 5 countries:", 
-                  choices = unique(common_countries),
-                  selected = "Global",
-                  multiple = TRUE,
-                  options = list(maxItems = 5)),
+                     choices = unique(common_countries),
+                     selected = "Global",
+                     multiple = TRUE,
+                     options = list(maxItems = 5)),
       radioButtons("change_type", "Select Change Type:",
                    choices = c("Percentage Change" = "percentage"),
                    selected = "percentage"),
+      selectInput("scatter_x", "Select X-axis Variable for Scatter Plot:",
+                  choices = c("GDP" = "gdp", "Population" = "population", "CO2 Emissions" = "co2")),
+      selectInput("scatter_y", "Select Y-axis Variable for Scatter Plot:",
+                  choices = c("GDP" = "gdp", "Population" = "population", "CO2 Emissions" = "co2")),
       helpText("Use the slider to select year range and checkboxes to choose variables.")
     ),
     
     mainPanel(
       tabsetPanel(
         tabPanel("Bar Plot", plotOutput("bar_plots", height = "800px")),
-        tabPanel("Line Plot", plotOutput("line_plots", height = "400px"))
+        tabPanel("Line Plot", plotOutput("line_plots", height = "400px")),
+        tabPanel("Scatter Plot", plotOutput("scatter_plot", height = "400px"))
       )
     )
   )
