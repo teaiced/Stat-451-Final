@@ -1,4 +1,10 @@
 ui <- fluidPage(
+  theme = bs_theme(
+    bg = "#F0FFF0",
+    fg = "#333333",
+    primary = "#8B668B",
+    base_font = font_google("Inter")
+  ),
   titlePanel("Global Trends in GDP, Population, and CO2 Emissions"),
   sidebarLayout(
     sidebarPanel(
@@ -14,9 +20,12 @@ ui <- fluidPage(
                    selected = "percentage"),
       helpText("Use the slider to select year range and checkboxes to choose variables.")
     ),
+    
     mainPanel(
-      plotOutput("bar_plots", height = "800px"),
-      plotOutput("line_plots", height = "400px")
+      tabsetPanel(
+        tabPanel("Bar Plot", plotOutput("bar_plots", height = "800px")),
+        tabPanel("Line Plot", plotOutput("line_plots", height = "400px"))
+      )
     )
   )
 )
