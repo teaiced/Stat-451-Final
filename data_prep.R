@@ -33,43 +33,20 @@ co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
     Country = recode(Country, "USA" = "United States")
   )
 
-world <- ne_countries(scale = "medium", returnclass = "sf")
+setdiff(pop_data$Country, gdp_data$Country)
+setdiff(pop_data$Country, co2_data$Country)
+setdiff(pop_data$Country, co2_data$Country)
+
+common_countries <- Reduce(intersect, list(gdp_data$Country, pop_data$Country, co2_data$Country))
+
+gdp_data <- gdp_data %>% filter(Country %in% common_countries)
+pop_data <- pop_data %>% filter(Country %in% common_countries)
+co2_data <- co2_data %>% filter(Country %in% common_countries)
+
 
 common_years <- Reduce(intersect, list(unique(gdp_data$Year), unique(pop_data$Year), unique(co2_data$Year)))
 start_year <- min(common_years)
 end_year <- max(common_years)
-
-process_and_plot_map <- function(data, value_col, variable_name, selected_year, world_data) {
-  data_year <- data %>% filter(Year == selected_year)
-  
-  map_data <- world_data %>%
-    left_join(data_year, by = c("iso_a3" = "Country_Code"))
-  
-  max_value <- max(map_data[[value_col]], na.rm = TRUE)
-  scale_labels <- if (variable_name == "GDP") {
-    scales::label_number(scale = 1e-12, suffix = " T")
-  } else if (variable_name == "Population") {
-    scales::label_number(scale = 1e-9, suffix = " B")
-  } else {
-    scales::label_number(scale = 1e-3, suffix = " K")
-  }
-  
-  ggplot(map_data) +
-    geom_sf(aes(fill = !!sym(value_col)), color = "black", size = 0.1) +
-    scale_fill_gradientn(
-      colors = c("white", "lightcoral", "red", "darkred"),
-      na.value = "grey80",
-      name = variable_name,
-      labels = scale_labels
-    ) +
-    theme_void() +
-    theme(
-      legend.position = "right",
-      legend.title = element_text(size = 10),
-      legend.text = element_text(size = 8)
-    ) +
-    labs(title = paste(variable_name, " Map (", selected_year, ")", sep = ""))
-}
 
 process_and_plot_line <- function(data, value_col, variable_name, top_countries, year_range, map_countries) {
   data <- data %>% filter(Country_Code %in% map_countries)
@@ -106,13 +83,4 @@ process_and_plot_line <- function(data, value_col, variable_name, top_countries,
     )
 }
 
-generate_global_color_mapping <- function(all_countries) {
-  n <- length(all_countries)
-  
-  colors <- colorRampPalette(brewer.pal(8, "Set2"))(n)
-  
-  names(colors) <- all_countries
-  return(colors)
-}
 all_countries <- unique(c(gdp_data$Country, pop_data$Country, co2_data$Country))
-global_color_mapping <- generate_global_color_mapping(all_countries)
