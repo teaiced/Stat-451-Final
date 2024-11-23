@@ -1,18 +1,3 @@
-library(shiny)
-library(readr)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(rnaturalearth)
-library(sf)
-library(patchwork)
-library(scales)
-library(RColorBrewer)
-library(bslib)
-library(ggrepel)
-
-#setwd("~/Documents/Classes/Stat451")
-
 gdp_data <- read_csv("data/gdp.csv", skip = 4, show_col_types = FALSE) %>%
   dplyr::select(-contains("...")) %>%
   dplyr::rename(Country = `Country Name`, Country_Code = `Country Code`) %>%
@@ -53,12 +38,14 @@ start_year <- min(common_years)
 end_year <- max(common_years)
 
 generate_shared_palette <- function(countries) {
-  all_colors <- brewer_pal(palette = "Set1")(length(countries))
-  visible_colors <- setdiff(all_colors, c("#FFFF33"))
-  final_palette <- visible_colors[seq_along(countries)]
-  names(final_palette) <- countries
-  final_palette
+  # Use the Set1 palette and interpolate if the number of countries exceeds the palette size
+  base_colors <- brewer_pal(palette = "Set1")(min(length(countries), 9))  # Set1 has 9 distinct colors
+  extended_colors <- colorRampPalette(base_colors)(length(countries))    # Interpolate colors for larger sets
+  visible_colors <- setdiff(extended_colors, c("#FFFF33"))               # Exclude light yellow if present
+  names(visible_colors) <- countries                                    # Assign countries to colors
+  visible_colors
 }
+
 
 shared_palette <- scales::brewer_pal(palette = "Set4")(length(common_countries))
 shared_palette <- generate_shared_palette(common_countries)
@@ -180,20 +167,26 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
     data_filtered <- data %>%
       group_by(Country) %>%
       filter(!all(is.na(!!sym(value_col)))) %>%
-      ungroup() %>% 
+      ungroup() %>%
       filter(Country %in% countries)
-    
     
     top_countries <- data_filtered %>%
       group_by(Country) %>%
       summarize(MaxValue = max(!!sym(value_col), na.rm = TRUE)) %>%
-      filter(!is.infinite(MaxValue)) %>%  # Exclude -Inf values
+      filter(!is.infinite(MaxValue)) %>%
       arrange(desc(MaxValue)) %>%
       slice_head(n = 5) %>%
       pull(Country)
     
     data_filtered <- data_filtered %>%
       filter(Country %in% top_countries)
+    
+    # Adjusted label data
+    label_data <- data_filtered %>%
+      group_by(Country) %>%
+      filter(Year == max(Year)) %>%
+      mutate(x_label_pos = max(Year) + 1) %>%  # Position labels outside the plot range
+      ungroup()
     
     p <- ggplot(data_filtered, aes(x = Year, y = !!sym(value_col), color = Country)) +
       geom_line(size = 1.2, na.rm = TRUE) +
@@ -205,7 +198,7 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         y = variable_name
       ) +
       scale_x_continuous(
-        limits = year_range,
+        limits = c(year_range[1], year_range[2] + 5),
         breaks = seq(year_range[1], year_range[2], by = 5)
       ) +
       scale_y_continuous(
@@ -217,17 +210,23 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
           scales::label_number(scale = 1e-6, suffix = " M")
         }
       ) +
+      geom_text_repel(
+        data = label_data,
+        aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
+        nudge_x = 0.5,
+        hjust = 0,
+        size = 4,
+        box.padding = 0.3,
+        point.padding = 0.1,
+        show.legend = FALSE
+      ) +
       theme(
         legend.position = "none"
-      ) +
-      xlim(year_range[1], year_range[2] + (year_range[2] - year_range[1])/5) +
-      geom_text_repel(aes(label = Country),
-                      data = data_filtered %>% filter(Year == year_range[2]),
-                      hjust = "right",
-                      segment.color = "transparent")
+      )
     
     plots[[variable]] <- p
   }
   
-  wrap_plots(plots, nrows(length(plots)))
+  wrap_plots(plots, nrow = length(plots))
 }
+
