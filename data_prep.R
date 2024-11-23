@@ -8,6 +8,8 @@ library(sf)
 library(patchwork)
 library(scales)
 library(RColorBrewer)
+library(bslib)
+library(ggrepel)
 
 #setwd("~/Documents/Classes/Stat451")
 
@@ -25,8 +27,7 @@ pop_data <- read_csv("data/pop.csv", skip = 4, show_col_types = FALSE) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "Population") %>%
   mutate(Year = as.integer(Year),
          Country = recode(Country, "Russian Federation" = "Russia"),
-         Country = recode(Country, "World" = "Global"),
-         Population = Population/1e9)
+         Country = recode(Country, "World" = "Global"))
 
 co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
   dplyr::select(-contains("...")) %>%
@@ -205,12 +206,12 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         }
       ) +
       theme(
-        legend.position = "right",
-        plot.title = element_text(size = 14, face = "bold"),
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10),
-        legend.text = element_text(size = 10)
-      )
+        legend.position = "none"
+      ) +
+      xlim(year_range[1], year_range[2] + (year_range[2] - year_range[1])/5) +
+      geom_text_repel(aes(label = Country),
+                      data = data_filtered %>% filter(Year == year_range[2]),
+                      hjust = 1)
     
     plots[[variable]] <- p
   }
