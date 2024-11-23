@@ -74,4 +74,107 @@ server <- function(input, output, session) {
     plot <- process_and_plot_line(data_list, variables, year_range, countries)
     plot
   })
+  
+  output$scatter_plot <- renderPlot({
+    data_list <- reactive_data()
+    x_var <- input$scatter_x
+    y_var <- input$scatter_y
+    countries <- input$countries
+    
+    # Define the columns based on selected variables
+    x_col <- if (x_var == "gdp") "GDP" else if (x_var == "population") "Population" else "CO2_Emissions"
+    y_col <- if (y_var == "gdp") "GDP" else if (y_var == "population") "Population" else "CO2_Emissions"
+    
+    # Filter data for selected countries and variables
+    scatter_data <- data_list[[x_var]] %>%
+      select(Country, Year, x = !!sym(x_col)) %>%
+      inner_join(
+        data_list[[y_var]] %>%
+          select(Country, Year, y = !!sym(y_col)),
+        by = c("Country", "Year")
+      ) %>%
+      filter(Country %in% countries) %>%
+      drop_na(x, y)
+    
+    # Check if data exists
+    if (nrow(scatter_data) == 0) {
+      return(
+        ggplot() +
+          geom_blank() +
+          theme_minimal() +
+          labs(
+            title = "No Data Available for Scatter Plot",
+            x = input$scatter_x,
+            y = input$scatter_y
+          )
+      )
+    }
+    
+    # Normalize year for alpha scaling
+    scatter_data <- scatter_data %>%
+      group_by(Country) %>%
+      mutate(Year_Scaled = scales::rescale(Year, to = c(0.5, 1))) %>%
+      ungroup()
+    
+    # Identify last year data points for labeling
+    last_year_data <- scatter_data %>%
+      group_by(Country) %>%
+      filter(Year == max(Year)) %>%
+      ungroup()
+    
+    # Define custom axis label formatting
+    x_label_format <- if (x_var == "gdp") {
+      scales::label_number(scale = 1e-12, suffix = " T")
+    } else if (x_var == "population") {
+      scales::label_number(scale = 1e-9, suffix = " B")
+    } else {
+      scales::label_number(scale = 1e-6, suffix = " M")
+    }
+    
+    y_label_format <- if (y_var == "gdp") {
+      scales::label_number(scale = 1e-12, suffix = " T")
+    } else if (y_var == "population") {
+      scales::label_number(scale = 1e-9, suffix = " B")
+    } else {
+      scales::label_number(scale = 1e-6, suffix = " M")
+    }
+    
+    # Scatter plot with improved aesthetics and formatted axis labels
+    ggplot(scatter_data, aes(x = x, y = y, color = Country, alpha = Year_Scaled, group = Country)) +
+      geom_path(size = 1, lineend = "round") +  # Smooth connecting lines
+      geom_point(size = 3) +  # Data points
+      scale_color_manual(
+        values = shared_palette,
+        guide = "none"  # Remove legend for color
+      ) +
+      scale_alpha(range = c(0.5, 1), guide = "none") +  # Alpha for year shading
+      scale_x_continuous(labels = x_label_format) +
+      scale_y_continuous(labels = y_label_format) +
+      geom_text_repel(
+        data = last_year_data,
+        aes(label = Country),
+        size = 4,
+        nudge_x = 0.2,
+        nudge_y = 0.2,
+        box.padding = 0.3,
+        point.padding = 0.1,
+        show.legend = FALSE,
+        color = "Black"# No legend for labels
+      ) +
+      theme_minimal(base_size = 14) +  # Cleaner theme
+      labs(
+        title = paste("Scatter Plot of", input$scatter_x, "vs", input$scatter_y, "Over All Years"),
+        x = input$scatter_x,
+        y = input$scatter_y
+      ) +
+      theme(
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Centered and bold title
+        axis.title = element_text(size = 14),  # Larger axis titles
+        axis.text = element_text(size = 12),  # Larger axis text
+        panel.grid.major = element_line(color = "gray85"),  # Subtle grid lines
+        panel.grid.minor = element_blank(),  # Hide minor grid lines
+        panel.border = element_rect(color = "gray80", fill = NA)  # Add subtle panel border
+      )
+  })
+  
 }
