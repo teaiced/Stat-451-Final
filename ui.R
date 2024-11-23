@@ -1,6 +1,6 @@
 ui <- fluidPage(
   theme = bs_theme(
-    bg = "#F0FFF0",
+    bg = "white",
     fg = "#333333",
     primary = "#8B668B",
     base_font = font_google("Inter")
@@ -12,10 +12,11 @@ ui <- fluidPage(
       checkboxGroupInput("variables", "Select Variables to Display:",
                          choices = c("GDP" = "gdp", "Population" = "population", "CO2 Emissions" = "co2"),
                          selected = c("gdp", "population", "co2")),
-      selectInput("countries", "Select countries:", 
+      selectizeInput("countries", "Select up to 5 countries:", 
                   choices = unique(common_countries),
                   selected = "Global",
-                  multiple = TRUE),
+                  multiple = TRUE,
+                  options = list(maxItems = 5)),
       radioButtons("change_type", "Select Change Type:",
                    choices = c("Percentage Change" = "percentage"),
                    selected = "percentage"),

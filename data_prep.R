@@ -19,6 +19,7 @@ gdp_data <- read_csv("data/gdp.csv", skip = 4, show_col_types = FALSE) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "GDP") %>%
   mutate(Year = as.integer(Year),
          Country = recode(Country, "Russian Federation" = "Russia"),
+         Country = recode(Country, "United States" = "USA"),
          Country = recode(Country, "World" = "Global"))
 
 pop_data <- read_csv("data/pop.csv", skip = 4, show_col_types = FALSE) %>%
@@ -27,6 +28,7 @@ pop_data <- read_csv("data/pop.csv", skip = 4, show_col_types = FALSE) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "Population") %>%
   mutate(Year = as.integer(Year),
          Country = recode(Country, "Russian Federation" = "Russia"),
+         Country = recode(Country, "United States" = "USA"),
          Country = recode(Country, "World" = "Global"))
 
 co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
@@ -37,8 +39,7 @@ co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
     Country_Code = `ISO 3166-1 alpha-3`
   ) %>%
   mutate(
-    Year = as.integer(Year),
-    Country = recode(Country, "USA" = "United States")
+    Year = as.integer(Year)
   )
 
 common_countries <- Reduce(intersect, list(gdp_data$Country, pop_data$Country, co2_data$Country))
@@ -211,11 +212,12 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
       xlim(year_range[1], year_range[2] + (year_range[2] - year_range[1])/5) +
       geom_text_repel(aes(label = Country),
                       data = data_filtered %>% filter(Year == year_range[2]),
-                      hjust = 1)
+                      hjust = "right",
+                      segment.color = "transparent")
     
     plots[[variable]] <- p
   }
   
-  wrap_plots(plots, ncol = length(plots))
+  wrap_plots(plots, nrows(length(plots)))
 }
 
