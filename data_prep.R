@@ -15,13 +15,18 @@ gdp_data <- read_csv("data/gdp.csv", skip = 4, show_col_types = FALSE) %>%
   dplyr::select(-contains("...")) %>%
   dplyr::rename(Country = `Country Name`, Country_Code = `Country Code`) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "GDP") %>%
-  mutate(Year = as.integer(Year))
+  mutate(Year = as.integer(Year),
+         Country = recode(Country, "Russian Federation" = "Russia"),
+         Country = recode(Country, "World" = "Global"))
 
 pop_data <- read_csv("data/pop.csv", skip = 4, show_col_types = FALSE) %>%
   dplyr::select(-contains("...")) %>%
   dplyr::rename(Country = `Country Name`, Country_Code = `Country Code`) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "Population") %>%
-  mutate(Year = as.integer(Year))
+  mutate(Year = as.integer(Year),
+         Country = recode(Country, "Russian Federation" = "Russia"),
+         Country = recode(Country, "World" = "Global"),
+         Population = Population/1e9)
 
 co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
   dplyr::select(-contains("...")) %>%
@@ -45,7 +50,7 @@ common_years <- Reduce(intersect, list(unique(gdp_data$Year), unique(pop_data$Ye
 start_year <- min(common_years)
 end_year <- max(common_years)
 
-process_and_plot_bar <- function(data_list, variables, year_range, global_limits, change_type) {
+process_and_plot_bar <- function(data_list, variables, year_range, global_limits, change_type, countries) {
   plots <- list()
   
   for (variable in variables) {
@@ -58,6 +63,7 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
     
     data_filtered <- data %>%
       filter(Year %in% c(start_year, end_year)) %>%
+      filter(Country %in% countries) %>%
       dplyr::select(Country, Year, !!sym(value_col)) %>%
       pivot_wider(names_from = Year, values_from = !!sym(value_col)) %>%
       rename(
@@ -150,7 +156,7 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
 
 
 
-process_and_plot_line <- function(data_list, variables, year_range) {
+process_and_plot_line <- function(data_list, variables, year_range, countries) {
   plots <- list()
   
   for (variable in variables) {
@@ -161,7 +167,9 @@ process_and_plot_line <- function(data_list, variables, year_range) {
     data_filtered <- data %>%
       group_by(Country) %>%
       filter(!all(is.na(!!sym(value_col)))) %>%
-      ungroup()
+      ungroup() %>% 
+      filter(Country %in% countries)
+    
     
     top_countries <- data_filtered %>%
       group_by(Country) %>%
@@ -209,3 +217,4 @@ process_and_plot_line <- function(data_list, variables, year_range) {
   
   wrap_plots(plots, ncol = length(plots))
 }
+

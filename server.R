@@ -12,6 +12,7 @@ server <- function(input, output, session) {
     variables <- input$variables
     year_range <- c(input$year_range[1], input$year_range[2])
     change_type <- input$change_type
+    countries <- input$countries
     
     if (change_type == "percentage") {
       all_percentage_changes <- unlist(lapply(variables, function(variable) {
@@ -60,7 +61,7 @@ server <- function(input, output, session) {
       }
     }
     
-    plot <- process_and_plot_bar(data_list, variables, year_range, global_limits, change_type)
+    plot <- process_and_plot_bar(data_list, variables, year_range, global_limits, change_type, countries)
     plot
   })
   
@@ -68,8 +69,9 @@ server <- function(input, output, session) {
     data_list <- reactive_data()
     variables <- input$variables
     year_range <- c(input$year_range[1], input$year_range[2])
+    countries <- input$countries
     
-    plot <- process_and_plot_line(data_list, variables, year_range)
+    plot <- process_and_plot_line(data_list, variables, year_range, countries)
     plot
   })
 }
