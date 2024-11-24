@@ -208,7 +208,6 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
     plots[[variable]] <- p
   }
   
-  # Combine all plots using patchwork
   patchwork::wrap_plots(plots, ncol = 1)
 }
 
@@ -240,11 +239,10 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
     data_filtered <- data_filtered %>%
       filter(Country %in% top_countries)
     
-    # Adjusted label data
     label_data <- data_filtered %>%
       group_by(Country) %>%
       filter(Year == max(Year)) %>%
-      mutate(x_label_pos = max(Year) + 1) %>%  # Position labels outside the plot range
+      mutate(x_label_pos = max(Year) + 1) %>%  
       ungroup()
     
     p <- ggplot(data_filtered, aes(x = Year, y = !!sym(value_col), color = Country)) +
@@ -262,11 +260,11 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
       ) +
       scale_y_continuous(
         labels = if (variable_name == "GDP") {
-          scales::label_number(scale = 1e-12, suffix = " T")
+          scales::label_number(scale = 1e-12, suffix = " Trillion USD")
         } else if (variable_name == "Population") {
-          scales::label_number(scale = 1e-9, suffix = " B")
+          scales::label_number(scale = 1e-9, suffix = " Billion People")
         } else {
-          scales::label_number(scale = 1e-6, suffix = " M")
+          scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")
         }
       ) +
       geom_text_repel(
@@ -274,17 +272,17 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
         nudge_x = 0.5,
         hjust = 0,
-        size = 5,  # Increased font size for labels
+        size = 5,  
         box.padding = 0.3,
         point.padding = 0.1,
         show.legend = FALSE
       ) +
       theme(
         legend.position = "none",
-        axis.text.x = element_text(size = 14),  # Increased font size for x-axis text
-        axis.text.y = element_text(size = 14),  # Increased font size for y-axis text
-        axis.title = element_text(size = 16),   # Increased font size for axis titles
-        plot.title = element_text(size = 18, face = "bold")  # Increased font size for plot title
+        axis.text.x = element_text(size = 14),  
+        axis.text.y = element_text(size = 14), 
+        axis.title = element_text(size = 16),   
+        plot.title = element_text(size = 18, face = "bold")  
       )
     
     plots[[variable]] <- p
@@ -292,3 +290,5 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
   
   wrap_plots(plots, nrow = length(plots))
 }
+
+
