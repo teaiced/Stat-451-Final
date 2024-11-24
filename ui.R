@@ -61,9 +61,9 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         id = "tabs",  # Add an ID to the tabsetPanel for referencing
-        tabPanel("Bar Plot", plotOutput("bar_plots", height = "800px")),
-        tabPanel("Line Plot", plotOutput("line_plots", height = "800px")),
-        tabPanel("Scatter Plot", plotOutput("scatter_plot", height = "800px"))
+        tabPanel("Bar Plot", plotOutput("bar_plots", height = "700px")),
+        tabPanel("Line Plot", plotOutput("line_plots", height = "700px")),
+        tabPanel("Scatter Plot", plotOutput("scatter_plot", height = "700px"))
       )
     )
   )
