@@ -1,4 +1,4 @@
-function(input, output, session) {
+server <- function(input, output, session) {
   reactive_data <- reactive({
     list(
       gdp = gdp_data %>% filter(Year >= input$year_range[1], Year <= input$year_range[2]),
@@ -104,19 +104,17 @@ function(input, output, session) {
           theme_minimal() +
           labs(
             title = "No Data Available for Scatter Plot",
-            x = input$scatter_x,
-            y = input$scatter_y
+            x = ifelse(x_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_x)),
+            y = ifelse(y_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_y))
           )
       )
     }
     
-    # Normalize year for alpha scaling
     scatter_data <- scatter_data %>%
       group_by(Country) %>%
       mutate(Year_Scaled = scales::rescale(Year, to = c(0.5, 1))) %>%
       ungroup()
     
-    # Identify last year data points for labeling
     last_year_data <- scatter_data %>%
       group_by(Country) %>%
       filter(Year == max(Year)) %>%
@@ -124,20 +122,25 @@ function(input, output, session) {
     
     # Define custom axis label formatting
     x_label_format <- if (x_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " T")
+      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
     } else if (x_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " B")
+      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
+    } else if (x_var == "co2") {
+      scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")  # CO2 in millions of metric tons
     } else {
-      scales::label_number(scale = 1e-6, suffix = " M")
+      scales::label_number()
     }
     
     y_label_format <- if (y_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " T")
+      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
     } else if (y_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " B")
+      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
+    } else if (y_var == "co2") {
+      scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")  # CO2 in millions of metric tons
     } else {
-      scales::label_number(scale = 1e-6, suffix = " M")
+      scales::label_number()
     }
+    
     
     # Scatter plot with improved aesthetics and formatted axis labels
     ggplot(scatter_data, aes(x = x, y = y, group = Country, color = Country, alpha = Year_Scaled)) +
@@ -155,14 +158,14 @@ function(input, output, session) {
         values = shared_palette,
         guide = "none"  # Remove legend for color
       ) +
-      scale_alpha(range = c(0.5, 1), guide = "none") +  # Alpha for year shading
+      scale_alpha(range = c(0.3, 1), guide = "none") +  # Alpha for year shading
       scale_x_continuous(labels = x_label_format) +
       scale_y_continuous(labels = y_label_format) +
       # Add last-year labels
       geom_text_repel(
         data = last_year_data,
         aes(label = Country),
-        size = 4,
+        size = 6,
         nudge_x = 0.2,
         nudge_y = 0.2,
         box.padding = 0.3,
@@ -173,9 +176,10 @@ function(input, output, session) {
       # Theme and labels
       theme_minimal(base_size = 14) +
       labs(
-        title = paste("Scatter Plot of", input$scatter_x, "vs", input$scatter_y, "Over All Years"),
-        x = input$scatter_x,
-        y = input$scatter_y
+        title = paste("Scatter Plot of", ifelse(x_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_x)),
+                      "vs", ifelse(y_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_y)), "Over All Years"),
+        x = ifelse(x_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_x)),
+        y = ifelse(y_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_y))
       ) +
       theme(
         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Centered and bold title
@@ -185,7 +189,6 @@ function(input, output, session) {
         panel.grid.minor = element_blank(),  # Hide minor grid lines
         panel.border = element_rect(color = "gray80", fill = NA)  # Add subtle panel border
       )
-    
   })
   
 }
