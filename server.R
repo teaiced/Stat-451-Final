@@ -1,4 +1,4 @@
-server <- function(input, output, session) {
+function(input, output, session) {
   reactive_data <- reactive({
     list(
       gdp = gdp_data %>% filter(Year >= input$year_range[1], Year <= input$year_range[2]),
@@ -140,9 +140,17 @@ server <- function(input, output, session) {
     }
     
     # Scatter plot with improved aesthetics and formatted axis labels
-    ggplot(scatter_data, aes(x = x, y = y, color = Country, alpha = Year_Scaled, group = Country)) +
-      geom_path(size = 1, lineend = "round") +  # Smooth connecting lines
-      geom_point(size = 3) +  # Data points
+    ggplot(scatter_data, aes(x = x, y = y, group = Country, color = Country, alpha = Year_Scaled)) +
+      # Draw paths as arrows
+      geom_segment(
+        data = scatter_data %>% dplyr::arrange(Country, Year) %>% dplyr::group_by(Country) %>%
+          dplyr::mutate(xend = dplyr::lead(x), yend = dplyr::lead(y)) %>% dplyr::ungroup(),
+        aes(x = x, y = y, xend = xend, yend = yend),
+        arrow = arrow(length = unit(0.15, "cm"), type = "closed"),  # Add arrowheads
+        lineend = "round",
+        size = 1
+      ) +
+      # Scale adjustments
       scale_color_manual(
         values = shared_palette,
         guide = "none"  # Remove legend for color
@@ -150,6 +158,7 @@ server <- function(input, output, session) {
       scale_alpha(range = c(0.5, 1), guide = "none") +  # Alpha for year shading
       scale_x_continuous(labels = x_label_format) +
       scale_y_continuous(labels = y_label_format) +
+      # Add last-year labels
       geom_text_repel(
         data = last_year_data,
         aes(label = Country),
@@ -159,9 +168,10 @@ server <- function(input, output, session) {
         box.padding = 0.3,
         point.padding = 0.1,
         show.legend = FALSE,
-        color = "Black"# No legend for labels
+        color = "black"
       ) +
-      theme_minimal(base_size = 14) +  # Cleaner theme
+      # Theme and labels
+      theme_minimal(base_size = 14) +
       labs(
         title = paste("Scatter Plot of", input$scatter_x, "vs", input$scatter_y, "Over All Years"),
         x = input$scatter_x,
@@ -175,6 +185,7 @@ server <- function(input, output, session) {
         panel.grid.minor = element_blank(),  # Hide minor grid lines
         panel.border = element_rect(color = "gray80", fill = NA)  # Add subtle panel border
       )
+    
   })
   
 }
