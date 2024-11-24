@@ -103,8 +103,8 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       if (change_type == "percentage") {
         global_min <- min(global_min, percentage_change, na.rm = TRUE)
         global_max <- max(global_max, percentage_change, na.rm = TRUE)
-      } else {
-        scaling_factor <- if (variable == "gdp") 1e12 else 1e6
+      } else {  # Absolute change
+        scaling_factor <- if (variable == "gdp") 1e12 else 1e6  # Trillions for GDP, Millions for others
         global_min <- min(global_min, change / scaling_factor, na.rm = TRUE)
         global_max <- max(global_max, change / scaling_factor, na.rm = TRUE)
       }
@@ -166,14 +166,16 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       combined_data <- combined_data[!is.na(combined_data$Percentage_Change), ]
       combined_data$x_var <- combined_data$Percentage_Change
       x_label <- "Percentage Change (%)"
+      axis_label_format <- scales::label_number(suffix = " %")
       title_suffix <- "Percentage Change"
-    } else {
+    } else {  # Absolute change
       scaling_factor <- if (variable == "gdp") 1e12 else 1e6  # Trillions for GDP, Millions for others
-      unit_label <- if (variable == "gdp") "Trillions" else "Millions"
+      unit_label <- if (variable == "gdp") "Trillion USD" else if (variable == "population") "Million People" else "Million Metric Tons"
       
       combined_data <- combined_data[!is.na(combined_data$Change), ]
       combined_data$x_var <- combined_data$Change / scaling_factor
       x_label <- paste("Change in", variable_name, "(", unit_label, ")", sep = " ")
+      axis_label_format <- scales::label_number(scale = 1, suffix = paste0(" ", unit_label))
       title_suffix <- "Absolute Change"
     }
     
@@ -193,21 +195,10 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       next
     }
     
-    # Sort data for display (top and bottom 10 changes)
+    # Sort data for display and reorder levels by descending x_var
     combined_data <- combined_data %>%
-      dplyr::arrange(desc(x_var)) %>%  # Sort in descending order
-      dplyr::mutate(Country = factor(Country, levels = unique(Country[order(x_var)])))  # Ensure proper order
-    
-    # Format x-axis labels dynamically
-    axis_label_format <- if (change_type == "percentage") {
-      scales::label_number(suffix = " %")  # Percentage suffix
-    } else if (variable == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions
-    } else if (variable == "population") {
-      scales::label_number(scale = 1e-6, suffix = " Million People")  # Population in millions
-    } else {
-      scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")  # CO2 in millions
-    }
+      dplyr::arrange(desc(x_var)) %>%
+      dplyr::mutate(Country = factor(Country, levels = Country))  # Reorder by descending x_var
     
     # Create the plot
     p <- ggplot(combined_data, aes(x = x_var, y = Country, fill = (x_var > 0))) +
@@ -224,9 +215,10 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       ) +
       theme(
         legend.position = "top",
-        axis.text.y = element_text(size = 6),
-        axis.title = element_text(size = 10),
-        plot.title = element_text(size = 12, face = "bold")
+        axis.text.y = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size = 18, face = "bold")
       )
     
     # Add plot to the list
@@ -236,7 +228,6 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
   # Combine all plots using patchwork
   patchwork::wrap_plots(plots, ncol = 1)
 }
-
 
 
 
@@ -299,13 +290,17 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
         nudge_x = 0.5,
         hjust = 0,
-        size = 4,
+        size = 5,  # Increased font size for labels
         box.padding = 0.3,
         point.padding = 0.1,
         show.legend = FALSE
       ) +
       theme(
-        legend.position = "none"
+        legend.position = "none",
+        axis.text.x = element_text(size = 14),  # Increased font size for x-axis text
+        axis.text.y = element_text(size = 14),  # Increased font size for y-axis text
+        axis.title = element_text(size = 16),   # Increased font size for axis titles
+        plot.title = element_text(size = 18, face = "bold")  # Increased font size for plot title
       )
     
     plots[[variable]] <- p
