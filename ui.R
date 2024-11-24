@@ -37,7 +37,7 @@ ui <- fluidPage(
         radioButtons(
           "change_type",
           "Select Change Type:",
-          choices = c("Percentage Change" = "percentage"),
+          choices = c("Percentage Change" = "percentage", "Overall Chnage" = "absolute"),
           selected = "percentage"
         )
       ),
@@ -61,9 +61,9 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         id = "tabs",  # Add an ID to the tabsetPanel for referencing
-        tabPanel("Bar Plot", plotOutput("bar_plots", height = "1200px")),
-        tabPanel("Line Plot", plotOutput("line_plots", height = "1200px")),
-        tabPanel("Scatter Plot", plotOutput("scatter_plot", height = "1200px"))
+        tabPanel("Bar Plot", plotOutput("bar_plots", height = "800px")),
+        tabPanel("Line Plot", plotOutput("line_plots", height = "800px")),
+        tabPanel("Scatter Plot", plotOutput("scatter_plot", height = "800px"))
       )
     )
   )
