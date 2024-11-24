@@ -82,7 +82,6 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
     filtered_data <- data %>%
       dplyr::filter(Country %in% countries, !is.na(!!rlang::sym(value_col)))
     
-    
     combined_data <- data.frame()
     
     for (country in unique(filtered_data$Country)) {
@@ -94,7 +93,7 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       if (is.na(start_year_actual) || is.na(end_year_actual)) {
         next
       }
-
+      
       start_value <- country_data[[value_col]][which(country_data$Year == start_year_actual)]
       end_value <- country_data[[value_col]][which(country_data$Year == end_year_actual)]
       
@@ -115,24 +114,19 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
         )
       )
     }
-  
-    print("Combined data:")
-    print(head(combined_data))
     
     if (change_type == "percentage") {
       combined_data <- combined_data[!is.na(combined_data$Percentage_Change), ]
       combined_data$x_var <- combined_data$Percentage_Change
       x_label <- "Percentage Change (%)"
-      x_limits <- global_limits$percentage
       title_suffix <- "Percentage Change"
     } else {
-      scaling_factor <- if (variable == "gdp") 1e12 else 1e6  # Trillions for GDP, Millions for others
+      scaling_factor <- if (variable == "gdp") 1e12 else 1e6
       unit_label <- if (variable == "gdp") "Trillions" else "Millions"
       
       combined_data <- combined_data[!is.na(combined_data$Change), ]
       combined_data$x_var <- combined_data$Change / scaling_factor
       x_label <- paste("Change in", variable_name, "(", unit_label, ")", sep = " ")
-      x_limits <- global_limits$absolute[[variable]]
       title_suffix <- "Absolute Change"
     }
     
@@ -158,10 +152,31 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
         tail(combined_data, 10)
       )
     
+    x_limits <- range(combined_data$x_var, na.rm = TRUE)
+    x_limits <- c(x_limits[1] * 1.1, x_limits[2] * 1.1)
+    
+    if (x_limits[1] > 0) {
+      x_limits[1] <- 0
+    }
+    if (x_limits[2] < 0) {
+      x_limits[2] <- 0
+    }
+    
+    axis_label_format <- if (change_type == "percentage") {
+      scales::label_number(suffix = " %")  # Add percentage suffix for percentage change
+    } else if (variable == "gdp") {
+      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # Trillions for GDP
+    } else if (variable == "population") {
+      scales::label_number(scale = 1e-6, suffix = " Million People")  # Millions for Population
+    } else {
+      scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")  # Millions for CO2
+    }
+    
     p <- ggplot(combined_data, aes(x = x_var, y = reorder(Country, x_var), fill = (x_var > 0))) +
       geom_vline(xintercept = 0, color = "black", linetype = "dashed") +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c(`TRUE` = "darkgreen", `FALSE` = "red")) +
+      scale_x_continuous(labels = axis_label_format, limits = x_limits) +  # Use corrected x-axis labels
       theme_minimal() +
       labs(
         title = paste(variable_name, title_suffix, "(", start_year, "-", end_year, ")", sep = " "),
@@ -169,7 +184,6 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
         y = "",
         fill = "Change"
       ) +
-      xlim(x_limits) +
       theme(
         legend.position = "top",
         axis.text.y = element_text(size = 6),
@@ -182,8 +196,6 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
   
   patchwork::wrap_plots(plots, ncol = 1)
 }
-
-
 
 
 process_and_plot_line <- function(data_list, variables, year_range, countries) {
