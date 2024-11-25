@@ -122,21 +122,21 @@ server <- function(input, output, session) {
     
     # Define custom axis label formatting
     x_label_format <- if (x_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
+      scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
     } else if (x_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
+      scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
     } else if (x_var == "co2") {
-      scales::label_number(scale = 1e-3, suffix = " Billion Metric Tons")  # CO2 in millions of metric tons
+      scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
     } else {
       scales::label_number()
     }
     
     y_label_format <- if (y_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
+      scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
     } else if (y_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
+      scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
     } else if (y_var == "co2") {
-      scales::label_number(scale = 1e-3, suffix = " Billion Metric Tons")  # CO2 in millions of metric tons
+      scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
     } else {
       scales::label_number()
     }
@@ -208,3 +208,4 @@ server <- function(input, output, session) {
         }
       )
   })
+}
