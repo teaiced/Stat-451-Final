@@ -74,7 +74,6 @@ server <- function(input, output, session) {
     plot <- process_and_plot_line(data_list, variables, year_range, countries)
     plot
   })
-<<<<<<< HEAD
   
   output$scatter_plot <- renderPlot({
     data_list <- reactive_data()
@@ -123,21 +122,21 @@ server <- function(input, output, session) {
     
     # Define custom axis label formatting
     x_label_format <- if (x_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
+      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
     } else if (x_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
+      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
     } else if (x_var == "co2") {
-      scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
+      scales::label_number(scale = 1e-3, suffix = " Billion Metric Tons")  # CO2 in millions of metric tons
     } else {
       scales::label_number()
     }
     
     y_label_format <- if (y_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
+      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
     } else if (y_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
+      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
     } else if (y_var == "co2") {
-      scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
+      scales::label_number(scale = 1e-3, suffix = " Billion Metric Tons")  # CO2 in millions of metric tons
     } else {
       scales::label_number()
     }
@@ -150,7 +149,7 @@ server <- function(input, output, session) {
         data = scatter_data %>% dplyr::arrange(Country, Year) %>% dplyr::group_by(Country) %>%
           dplyr::mutate(xend = dplyr::lead(x), yend = dplyr::lead(y)) %>% dplyr::ungroup(),
         aes(x = x, y = y, xend = xend, yend = yend),
-        arrow = arrow(length = unit(0.15, "cm"), type = "closed"),  # Add arrowheads
+        arrow = arrow(length = unit(0.15, "cm"), type = "closed"),
         lineend = "round",
         size = 1
       ) +
@@ -178,7 +177,7 @@ server <- function(input, output, session) {
       theme_minimal(base_size = 14) +
       labs(
         title = paste("Scatter Plot of", ifelse(x_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_x)),
-                      "vs", ifelse(y_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_y)), "Over All Years"),
+                      "vs", ifelse(y_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_y)), "Over Selected Years"),
         x = ifelse(x_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_x)),
         y = ifelse(y_var == "gdp", "Gross Domestic Product", tools::toTitleCase(input$scatter_y))
       ) +
@@ -189,27 +188,7 @@ server <- function(input, output, session) {
         panel.grid.major = element_line(color = "gray85"),  # Subtle grid lines
         panel.grid.minor = element_blank(),  # Hide minor grid lines
         panel.border = element_rect(color = "gray80", fill = NA)  # Add subtle panel border
-      ) +
-      xlab(
-        if (x_var == "gdp") {
-          "GDP (in trillions of USD)"  # GDP in trillions of USD
-        } else if (x_var == "population") {
-          "Population (in billions)"  # Population in billions
-        } else {
-          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
-        }
-      ) +
-      ylab(
-        if (y_var == "gdp") {
-          "GDP (in trillions of USD)"  # GDP in trillions of USD
-        } else if (y_var == "population") {
-          "Population (in billions)"  # Population in billions
-        } else {
-          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
-        }
       )
   })
   
-=======
->>>>>>> a3126de942beee46543e51669587da7dbdfb6703
 }
