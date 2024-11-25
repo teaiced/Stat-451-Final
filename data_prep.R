@@ -54,7 +54,7 @@ end_year <- max(common_years)
 
 generate_shared_palette <- function(countries) {
   # Define a fixed sequence of distinct colors
-  color_sequence <- c("firebrick", "steelblue", "thistle4", "blue4", "orange", "sienna", "forestgreen", "slateblue", "gold3", "gray")
+  color_sequence <- sample(c("firebrick", "steelblue", "thistle4", "blue4", "orange", "sienna", "forestgreen", "slateblue", "gold3", "black"))
   
   # Repeat the color sequence if there are more countries than colors
   extended_colors <- rep(color_sequence, length.out = length(countries))
