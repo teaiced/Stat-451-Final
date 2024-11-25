@@ -268,13 +268,13 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
       ) +
       ylab(
         if (variable_name == "GDP") {
-          "GDP (in trillions of USD"
+          "GDP (in trillions of USD)"
         } else if (variable_name == "Population") {
-          "Population (in billions"
+          "Population (in billions)"
         } else {
           "CO2 (in billions of tonnes)"
         }
-      )
+      ) +
       geom_text_repel(
         data = label_data,
         aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
