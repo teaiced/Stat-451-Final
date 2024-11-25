@@ -163,7 +163,7 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       combined_data <- combined_data[!is.na(combined_data$Change), ]
       combined_data$x_var <- combined_data$Change / scaling_factor
       x_label <- paste("Change in", variable_name, "(", unit_label, ")", sep = " ")
-      axis_label_format <- scales::label_number(scale = 1, suffix = paste0(" ", unit_label))
+      axis_label_format <- scales::label_number(scale = 1)
       
       plot_x_limits <- range(combined_data$x_var, na.rm = TRUE)
       plot_x_limits <- c(plot_x_limits[1] * 1.1, plot_x_limits[2] * 1.1)
