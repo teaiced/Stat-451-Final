@@ -37,7 +37,7 @@ ui <- fluidPage(
         radioButtons(
           "change_type",
           "Select Change Type:",
-          choices = c("Percentage Change" = "percentage", "Overall Chnage" = "absolute"),
+          choices = c("Percentage Change" = "percentage", "Overall Change" = "absolute"),
           selected = "percentage"
         )
       ),
