@@ -195,7 +195,7 @@ server <- function(input, output, session) {
         } else if (x_var == "population") {
           "Population (in billions)"  # Population in billions
         } else {
-          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
+          "CO2 (in billion tons)"  # CO2 in millions of metric tons
         }
       ) +
       ylab(
@@ -204,7 +204,7 @@ server <- function(input, output, session) {
         } else if (y_var == "population") {
           "Population (in billions)"  # Population in billions
         } else {
-          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
+          "CO2 (in billion tons)"  # CO2 in millions of metric tons
         }
       )
   })
