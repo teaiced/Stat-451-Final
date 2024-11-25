@@ -74,7 +74,7 @@ server <- function(input, output, session) {
     plot <- process_and_plot_line(data_list, variables, year_range, countries)
     plot
   })
-<<<<<<< HEAD
+
   
   output$scatter_plot <- renderPlot({
     data_list <- reactive_data()
@@ -209,7 +209,4 @@ server <- function(input, output, session) {
         }
       )
   })
-  
-=======
->>>>>>> a3126de942beee46543e51669587da7dbdfb6703
 }

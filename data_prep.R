@@ -259,13 +259,22 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
       ) +
       scale_y_continuous(
         labels = if (variable_name == "GDP") {
-          scales::label_number(scale = 1e-12, suffix = " Trillion USD")
+          scales::label_number(scale = 1e-12, suffix = " Trillion")
         } else if (variable_name == "Population") {
-          scales::label_number(scale = 1e-9, suffix = " Billion People")
+          scales::label_number(scale = 1e-9, suffix = " Billion")
         } else {
-          scales::label_number(scale = 1e-3, suffix = " Billion Metric Tons")
+          scales::label_number(scale = 1e-3, suffix = " Gt")
         }
       ) +
+      ylab(
+        if (variable_name == "GDP") {
+          "GDP (in trillions of USD"
+        } else if (variable_name == "Population") {
+          "Population (in billions"
+        } else {
+          "CO2 (in billions of tonnes)"
+        }
+      )
       geom_text_repel(
         data = label_data,
         aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
