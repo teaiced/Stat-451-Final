@@ -8,7 +8,6 @@ library(sf)
 library(patchwork)
 library(scales)
 library(RColorBrewer)
-library(bslib)
 library(ggrepel)
 
 #setwd("~/Documents/Classes/Stat451")
@@ -19,7 +18,6 @@ gdp_data <- read_csv("data/gdp.csv", skip = 4, show_col_types = FALSE) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "GDP") %>%
   mutate(Year = as.integer(Year),
          Country = recode(Country, "Russian Federation" = "Russia"),
-         Country = recode(Country, "United States" = "USA"),
          Country = recode(Country, "World" = "Global"))
 
 pop_data <- read_csv("data/pop.csv", skip = 4, show_col_types = FALSE) %>%
@@ -28,7 +26,6 @@ pop_data <- read_csv("data/pop.csv", skip = 4, show_col_types = FALSE) %>%
   pivot_longer(cols = matches("^\\d{4}$"), names_to = "Year", values_to = "Population") %>%
   mutate(Year = as.integer(Year),
          Country = recode(Country, "Russian Federation" = "Russia"),
-         Country = recode(Country, "United States" = "USA"),
          Country = recode(Country, "World" = "Global"))
 
 co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
@@ -39,7 +36,8 @@ co2_data <- read_csv("data/co2.csv", show_col_types = FALSE) %>%
     Country_Code = `ISO 3166-1 alpha-3`
   ) %>%
   mutate(
-    Year = as.integer(Year)
+    Year = as.integer(Year),
+    Country = recode(Country, "USA" = "United States")
   )
 
 common_countries <- Reduce(intersect, list(gdp_data$Country, pop_data$Country, co2_data$Country))
@@ -52,121 +50,63 @@ common_years <- Reduce(intersect, list(unique(gdp_data$Year), unique(pop_data$Ye
 start_year <- min(common_years)
 end_year <- max(common_years)
 
-generate_shared_palette <- function(countries) {
-  base_colors <- brewer_pal(palette = "Set1")(min(length(countries), 5))  
-  extended_colors <- colorRampPalette(base_colors)(length(countries))    
-  visible_colors <- setdiff(extended_colors, c("#FFFF33"))               
-  names(visible_colors) <- countries                                    
-  visible_colors
-}
-
-
-shared_palette <- scales::brewer_pal(palette = "Set4")(length(common_countries))
-shared_palette <- generate_shared_palette(common_countries)
-
-process_and_plot_bar <- function(data_list, variables, year_range, global_limits, change_type, countries) {   
-  plots <- list()  
-  global_min <- Inf  
-  global_max <- -Inf 
-  
-  if (change_type == "percentage") {
-    for (variable in variables) {
-      data <- data_list[[variable]]
-      value_col <- if (variable == "gdp") "GDP" else if (variable == "population") "Population" else "CO2_Emissions"
-      
-      filtered_data <- data %>%
-        dplyr::filter(Country %in% countries, !is.na(!!rlang::sym(value_col)))
-      
-      for (country in unique(filtered_data$Country)) {
-        country_data <- filtered_data[filtered_data$Country == country, ]
-        
-        start_year <- as.integer(year_range[1])
-        end_year <- as.integer(year_range[2])
-        start_year_actual <- country_data$Year[which.min(abs(country_data$Year - start_year))]
-        end_year_actual <- country_data$Year[which.min(abs(country_data$Year - end_year))]
-        
-        if (is.na(start_year_actual) || is.na(end_year_actual)) next
-        
-        start_value <- country_data[[value_col]][which(country_data$Year == start_year_actual)]
-        end_value <- country_data[[value_col]][which(country_data$Year == end_year_actual)]
-        
-        if (is.na(start_value) || is.na(end_value)) next
-        
-        percentage_change <- ifelse(start_value == 0, NA, (end_value - start_value) / abs(start_value) * 100)
-        
-        global_min <- min(global_min, percentage_change, na.rm = TRUE)
-        global_max <- max(global_max, percentage_change, na.rm = TRUE)
-      }
-    }
-    
-    global_x_limits <- c(global_min * 1.1, global_max * 1.1)
-    if (global_x_limits[1] > 0) global_x_limits[1] <- 0
-    if (global_x_limits[2] < 0) global_x_limits[2] <- 0
-  }
+process_and_plot_bar <- function(data_list, variables, year_range, global_limits, change_type, countries) {
+  plots <- list()
   
   for (variable in variables) {
     data <- data_list[[variable]]
     value_col <- if (variable == "gdp") "GDP" else if (variable == "population") "Population" else "CO2_Emissions"
     variable_name <- if (variable == "gdp") "GDP" else if (variable == "population") "Population" else "CO2 Emissions"
     
-    filtered_data <- data %>%
-      dplyr::filter(Country %in% countries, !is.na(!!rlang::sym(value_col)))
+    start_year <- as.integer(year_range[1])
+    end_year <- as.integer(year_range[2])
     
-    combined_data <- data.frame()  # Initialize an empty data frame
-    
-    for (country in unique(filtered_data$Country)) {
-      country_data <- filtered_data[filtered_data$Country == country, ]
-      
-      start_year <- as.integer(year_range[1])
-      end_year <- as.integer(year_range[2])
-      start_year_actual <- country_data$Year[which.min(abs(country_data$Year - start_year))]
-      end_year_actual <- country_data$Year[which.min(abs(country_data$Year - end_year))]
-      
-      if (is.na(start_year_actual) || is.na(end_year_actual)) next
-      
-      start_value <- country_data[[value_col]][which(country_data$Year == start_year_actual)]
-      end_value <- country_data[[value_col]][which(country_data$Year == end_year_actual)]
-      
-      if (is.na(start_value) || is.na(end_value)) next
-      
-      combined_data <- rbind(
-        combined_data,
-        data.frame(
-          Country = country,
-          Start_Value = start_value,
-          Start_Year_Actual = start_year_actual,
-          End_Value = end_value,
-          End_Year_Actual = end_year_actual,
-          Change = end_value - start_value,
-          Percentage_Change = ifelse(start_value == 0, NA, (end_value - start_value) / abs(start_value) * 100)
-        )
+    data_filtered <- data %>%
+      filter(Year %in% c(start_year, end_year)) %>%
+      filter(Country %in% countries) %>%
+      dplyr::select(Country, Year, !!sym(value_col)) %>%
+      pivot_wider(names_from = Year, values_from = !!sym(value_col)) %>%
+      rename(
+        Start_Value = !!sym(as.character(start_year)),
+        End_Value = !!sym(as.character(end_year))
+      ) %>%
+      drop_na(c("Start_Value", "End_Value")) %>%
+      mutate(
+        Change = End_Value - Start_Value,
+        Percentage_Change = ifelse(Start_Value == 0, NA, (Change / abs(Start_Value)) * 100)
       )
-    }
     
     if (change_type == "percentage") {
-      combined_data <- combined_data[!is.na(combined_data$Percentage_Change), ]
-      combined_data$x_var <- combined_data$Percentage_Change
+      data_filtered <- data_filtered %>%
+        filter(is.finite(Percentage_Change)) %>%
+        mutate(x_var = Percentage_Change)
       x_label <- "Percentage Change (%)"
-      axis_label_format <- scales::label_number(suffix = " %")
-      plot_x_limits <- global_x_limits
+      x_limits <- global_limits$percentage
       title_suffix <- "Percentage Change"
-    } else { 
-      scaling_factor <- if (variable == "gdp") 1e12 else 1e6 
-      unit_label <- if (variable == "gdp") "Trillion USD" else if (variable == "population") "Million People" else "Million Metric Tons"
+    } else {
+      if (variable == "gdp") {
+        scaling_factor <- 1e12  
+        unit_label <- "Trillions"
+      } else if (variable == "population") {
+        scaling_factor <- 1e6   
+        unit_label <- "Millions"
+      } else {
+        scaling_factor <- 1e6   
+        unit_label <- "Million Metric Tons"
+      }
       
-      combined_data <- combined_data[!is.na(combined_data$Change), ]
-      combined_data$x_var <- combined_data$Change / scaling_factor
+      data_filtered <- data_filtered %>%
+        filter(is.finite(Change)) %>%
+        mutate(
+          x_var = Change / scaling_factor
+        )
+      
       x_label <- paste("Change in", variable_name, "(", unit_label, ")", sep = " ")
-      axis_label_format <- scales::label_number(scale = 1, suffix = paste0(" ", unit_label))
-      
-      plot_x_limits <- range(combined_data$x_var, na.rm = TRUE)
-      plot_x_limits <- c(plot_x_limits[1] * 1.1, plot_x_limits[2] * 1.1)  
-      if (plot_x_limits[1] > 0) plot_x_limits[1] <- 0
-      if (plot_x_limits[2] < 0) plot_x_limits[2] <- 0
-      title_suffix <- "Overall Change"
+      x_limits <- global_limits$absolute[[variable]]
+      title_suffix <- "Absolute Change"
     }
     
-    if (nrow(combined_data) == 0) {
+    if (nrow(data_filtered) == 0) {
       p <- ggplot() +
         geom_blank() +
         theme_minimal() +
@@ -181,15 +121,18 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       next
     }
     
-    combined_data <- combined_data %>%
-      dplyr::arrange(x_var) %>%
-      dplyr::mutate(Country = factor(Country, levels = Country))  
+    data_filtered <- data_filtered %>%
+      arrange(desc(x_var))
     
-    p <- ggplot(combined_data, aes(x = x_var, y = Country, fill = (x_var > 0))) +
+    data_filtered <- rbind(
+      head(data_filtered, 10),
+      tail(data_filtered, 10)
+    )
+    
+    p <- ggplot(data_filtered, aes(x = x_var, y = reorder(Country, x_var), fill = (x_var > 0))) +
       geom_vline(xintercept = 0, color = "black", linetype = "dashed") +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c(`TRUE` = "darkgreen", `FALSE` = "red")) +
-      scale_x_continuous(labels = axis_label_format, limits = plot_x_limits) +  
       theme_minimal() +
       labs(
         title = paste(variable_name, title_suffix, "(", start_year, "-", end_year, ")", sep = " "),
@@ -197,20 +140,19 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
         y = "",
         fill = "Change"
       ) +
+      xlim(x_limits) +
       theme(
         legend.position = "top",
-        axis.text.y = element_text(size = 14),
-        axis.text.x = element_text(size = 14),
-        axis.title = element_text(size = 16),
-        plot.title = element_text(size = 18, face = "bold")
+        axis.text.y = element_text(size = 6),
+        axis.title = element_text(size = 10),
+        plot.title = element_text(size = 12, face = "bold")
       )
     
     plots[[variable]] <- p
   }
   
-  patchwork::wrap_plots(plots, ncol = 1)
+  wrap_plots(plots, ncol = 1)
 }
-
 
 
 
@@ -225,13 +167,14 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
     data_filtered <- data %>%
       group_by(Country) %>%
       filter(!all(is.na(!!sym(value_col)))) %>%
-      ungroup() %>%
+      ungroup() %>% 
       filter(Country %in% countries)
+    
     
     top_countries <- data_filtered %>%
       group_by(Country) %>%
       summarize(MaxValue = max(!!sym(value_col), na.rm = TRUE)) %>%
-      filter(!is.infinite(MaxValue)) %>%
+      filter(!is.infinite(MaxValue)) %>%  # Exclude -Inf values
       arrange(desc(MaxValue)) %>%
       slice_head(n = 5) %>%
       pull(Country)
@@ -239,15 +182,9 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
     data_filtered <- data_filtered %>%
       filter(Country %in% top_countries)
     
-    label_data <- data_filtered %>%
-      group_by(Country) %>%
-      filter(Year == max(Year)) %>%
-      mutate(x_label_pos = max(Year) + 1) %>%  
-      ungroup()
-    
     p <- ggplot(data_filtered, aes(x = Year, y = !!sym(value_col), color = Country)) +
       geom_line(size = 1.2, na.rm = TRUE) +
-      scale_color_manual(values = shared_palette) +
+      scale_color_brewer(palette = "Set1") +
       theme_minimal() +
       labs(
         title = paste(variable_name, "Over Time"),
@@ -255,29 +192,28 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         y = variable_name
       ) +
       scale_x_continuous(
-        limits = c(year_range[1], year_range[2] + 5),
+        limits = year_range,
         breaks = seq(year_range[1], year_range[2], by = 5)
       ) +
       scale_y_continuous(
         labels = if (variable_name == "GDP") {
+<<<<<<< HEAD
           scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
         } else if (variable_name == "Population") {
           scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
         } else {
           scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
+=======
+          scales::label_number(scale = 1e-12, suffix = " T")
+        } else if (variable_name == "Population") {
+          scales::label_number(scale = 1e-9, suffix = " B")
+        } else {
+          scales::label_number(scale = 1e-6, suffix = " M")
+>>>>>>> a3126de942beee46543e51669587da7dbdfb6703
         }
       ) +
-      geom_text_repel(
-        data = label_data,
-        aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
-        nudge_x = 0.5,
-        hjust = 0,
-        size = 5,  
-        box.padding = 0.3,
-        point.padding = 0.1,
-        show.legend = FALSE
-      ) +
       theme(
+<<<<<<< HEAD
         legend.position = "none",
         axis.text.x = element_text(size = 14),  # Increased font size for x-axis text
         axis.text.y = element_text(size = 14),  # Increased font size for y-axis text
@@ -293,10 +229,32 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
           "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
         }
       )
+=======
+        legend.position = "none"
+      ) +
+      xlim(year_range[1], year_range[2] + (year_range[2] - year_range[1])/5) +
+      #geom_text(data = data_filtered %>% filter(Year == year_range[2]),
+       #         aes(label = Country,
+        #        x = Year + 1,
+         #       y = Population,
+          #      color = Country))
+      geom_text_repel(aes(label = Country),
+                      data = data_filtered %>% filter(Year == year_range[2]),
+                      hjust = "right")
+                      # size = 3,
+                      # position = position_nudge_to(x = as.numeric(year_range[2] + years(50))),
+                      # segment.color = 'grey',
+                      # point.size = 0,
+                      # box.padding = 0.1,
+                      # point.padding = 0.1,
+                      # hjust = "left",
+                      # direction = "y")
+    
+>>>>>>> a3126de942beee46543e51669587da7dbdfb6703
     plots[[variable]] <- p
   }
   
-  wrap_plots(plots, nrow = length(plots))
+  wrap_plots(plots, ncol = length(plots))
 }
 
 
