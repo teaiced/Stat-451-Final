@@ -150,8 +150,8 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
       plot_x_limits <- global_x_limits
       title_suffix <- "Percentage Change"
     } else {
-      scaling_factor <- if (variable == "gdp") 1e12 else if (variable == "population") 1e6 else 1e6
-      unit_label <- if (variable == "gdp") "Trillion USD" else if (variable == "population") "Million People" else "Million Metric Tons"
+      scaling_factor <- if (variable == "gdp") 1e12 else if (variable == "population") 1e6 else 1e3
+      unit_label <- if (variable == "gdp") "Trillion USD" else if (variable == "population") "Million People" else "Billion Metric Tons"
       
       combined_data <- combined_data[!is.na(combined_data$Change), ]
       combined_data$x_var <- combined_data$Change / scaling_factor
