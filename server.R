@@ -122,21 +122,21 @@ server <- function(input, output, session) {
     
     # Define custom axis label formatting
     x_label_format <- if (x_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
+      scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
     } else if (x_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
+      scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
     } else if (x_var == "co2") {
-      scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")  # CO2 in millions of metric tons
+      scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
     } else {
       scales::label_number()
     }
     
     y_label_format <- if (y_var == "gdp") {
-      scales::label_number(scale = 1e-12, suffix = " Trillion USD")  # GDP in trillions of USD
+      scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
     } else if (y_var == "population") {
-      scales::label_number(scale = 1e-9, suffix = " Billion People")  # Population in billions
+      scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
     } else if (y_var == "co2") {
-      scales::label_number(scale = 1e-6, suffix = " Million Metric Tons")  # CO2 in millions of metric tons
+      scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
     } else {
       scales::label_number()
     }
@@ -188,6 +188,24 @@ server <- function(input, output, session) {
         panel.grid.major = element_line(color = "gray85"),  # Subtle grid lines
         panel.grid.minor = element_blank(),  # Hide minor grid lines
         panel.border = element_rect(color = "gray80", fill = NA)  # Add subtle panel border
+      ) +
+      xlab(
+        if (x_var == "gdp") {
+          "GDP (in trillions of USD)"  # GDP in trillions of USD
+        } else if (x_var == "population") {
+          "Population (in billions)"  # Population in billions
+        } else {
+          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
+        }
+      ) +
+      ylab(
+        if (y_var == "gdp") {
+          "GDP (in trillions of USD)"  # GDP in trillions of USD
+        } else if (y_var == "population") {
+          "Population (in billions)"  # Population in billions
+        } else {
+          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
+        }
       )
   })
   

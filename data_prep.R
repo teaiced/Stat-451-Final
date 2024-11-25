@@ -262,11 +262,11 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
       ) +
       scale_y_continuous(
         labels = if (variable_name == "GDP") {
-          scales::label_number(scale = 1e-12, suffix = " T")
+          scales::label_number(scale = 1e-12, suffix = " Trillion")  # GDP in trillions of USD
         } else if (variable_name == "Population") {
-          scales::label_number(scale = 1e-9, suffix = " B")
+          scales::label_number(scale = 1e-9, suffix = " Billion")  # Population in billions
         } else {
-          scales::label_number(scale = 1e-6, suffix = " M")
+          scales::label_number(scale = 1e-3, suffix = " Gt")  # CO2 in millions of metric tons
         }
       ) +
       geom_text_repel(
@@ -284,9 +284,17 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         axis.text.x = element_text(size = 14),  # Increased font size for x-axis text
         axis.text.y = element_text(size = 14),  # Increased font size for y-axis text
         axis.title = element_text(size = 16),   # Increased font size for axis titles
-        plot.title = element_text(size = 18, face = "bold")  # Increased font size for plot title
+        plot.title = element_text(size = 18, face = "bold"),  # Increased font size for plot title
+      ) +
+      ylab(
+        if (variable_name == "GDP") {
+          "GDP (in trillions of USD)"  # GDP in trillions of USD
+        } else if (variable_name == "Population") {
+          "Population (in billions)"  # Population in billions
+        } else {
+          "CO2 (in billions of tonnes)"  # CO2 in millions of metric tons
+        }
       )
-    
     plots[[variable]] <- p
   }
   
