@@ -10,7 +10,7 @@ https://data.worldbank.org/indicator/NY.GDP.MKTP.CD
 
 https://data.worldbank.org/indicator/SP.POP.TOTL
 
-Our primary focus is tracking CO₂ emissions over time, both globally and in specific countries. We will use line plots to illustrate trends over time and bar plots to display percent change during an interval of years. Our goal is to utilize Shiny to make these plots interactive; the user will be able to select specific countries and specific ranges of years.
+Our primary focus is tracking CO₂ emissions over time, both globally and in specific countries. We will use line plots to illustrate trends over time and bar plots to display percent change or overall change during an interval of years. Our goal is to utilize Shiny to make these plots interactive; the user will be able to select specific countries and specific ranges of years. To compare variables with each other, we will use a scatterplot with the option to choose one of CO₂ emissions, population, and GDP on the x and y-axes.
 
 In addition, we aim to analyze the relationships between CO₂ emissions and other country-specific factors, population, and GDP. Specifically, we will examine the correlation between these variables and CO₂ emissions, assessing whether these correlations have increased or decreased over time.
 
