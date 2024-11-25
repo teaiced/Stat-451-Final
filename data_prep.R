@@ -208,7 +208,6 @@ process_and_plot_bar <- function(data_list, variables, year_range, global_limits
     plots[[variable]] <- p
   }
   
-  # Combine all plots using patchwork
   patchwork::wrap_plots(plots, ncol = 1)
 }
 
@@ -240,11 +239,10 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
     data_filtered <- data_filtered %>%
       filter(Country %in% top_countries)
     
-    # Adjusted label data
     label_data <- data_filtered %>%
       group_by(Country) %>%
       filter(Year == max(Year)) %>%
-      mutate(x_label_pos = max(Year) + 1) %>%  # Position labels outside the plot range
+      mutate(x_label_pos = max(Year) + 1) %>%  
       ungroup()
     
     p <- ggplot(data_filtered, aes(x = Year, y = !!sym(value_col), color = Country)) +
@@ -274,7 +272,7 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
         aes(label = Country, x = x_label_pos, y = !!sym(value_col)),
         nudge_x = 0.5,
         hjust = 0,
-        size = 5,  # Increased font size for labels
+        size = 5,  
         box.padding = 0.3,
         point.padding = 0.1,
         show.legend = FALSE
@@ -300,3 +298,5 @@ process_and_plot_line <- function(data_list, variables, year_range, countries) {
   
   wrap_plots(plots, nrow = length(plots))
 }
+
+
