@@ -53,12 +53,19 @@ start_year <- min(common_years)
 end_year <- max(common_years)
 
 generate_shared_palette <- function(countries) {
-  base_colors <- brewer_pal(palette = "Dark2")(min(length(countries), 8))
-  extended_colors <- colorRampPalette(base_colors)(length(countries))
-  distinct_colors <- unique(extended_colors)
-  names(distinct_colors) <- countries
-  distinct_colors
+  # Define a fixed sequence of distinct colors
+  color_sequence <- c("firebrick", "steelblue", "thistle4", "blue4", "orange", "sienna", "forestgreen", "slateblue", "gold3", "gray")
+  
+  # Repeat the color sequence if there are more countries than colors
+  extended_colors <- rep(color_sequence, length.out = length(countries))
+  
+  # Assign colors to the countries in the order they are selected
+  named_colors <- setNames(extended_colors[seq_along(countries)], countries)
+  
+  # Return the palette
+  named_colors
 }
+
 
 # Example usage for all common countries
 shared_palette <- generate_shared_palette(common_countries)
